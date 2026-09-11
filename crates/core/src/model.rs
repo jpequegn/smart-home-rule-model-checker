@@ -264,6 +264,9 @@ pub fn validate(s: &Scenario, rules: &[Automation]) -> Result<()> {
         return Err("invalid alphabet or gaps".into());
     }
     for (id, e) in &s.entities {
+        if e.stale_after.is_some_and(|v| v > 86400) {
+            return Err("stale_after exceeds 86400".into());
+        }
         if id.is_empty()
             || id.len() > 100
             || e.domain.is_empty()
