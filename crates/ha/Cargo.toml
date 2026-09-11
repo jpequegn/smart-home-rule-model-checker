@@ -20,3 +20,7 @@ path = "tests/simulation.rs"
 [[test]]
 name = "lint"
 path = "tests/lint.rs"
+
+[[test]]
+name = "verification"
+path = "tests/verification.rs"
