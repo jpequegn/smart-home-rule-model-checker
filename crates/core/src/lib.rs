@@ -8,3 +8,5 @@ mod lint;
 pub use lint::*;
 mod check;
 pub use check::*;
+mod json;
+pub use json::*;
