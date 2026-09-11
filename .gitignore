@@ -1,0 +1,9 @@
+/target/
+/web/node_modules/
+/web/dist/
+/web/pkg/
+/output/
+/fuzz/target/
+/fuzz/corpus/
+/fuzz/artifacts/
+.DS_Store

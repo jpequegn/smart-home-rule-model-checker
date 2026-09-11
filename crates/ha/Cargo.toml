@@ -1,0 +1,9 @@
+[package]
+name = "home-rule-ha"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+[dependencies]
+home-rule-core = { path = "../core" }
+yaml-rust2 = "0.10"
+serde_json.workspace = true
