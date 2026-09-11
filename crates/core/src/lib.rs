@@ -6,3 +6,5 @@ mod engine;
 pub use engine::*;
 mod lint;
 pub use lint::*;
+mod check;
+pub use check::*;
