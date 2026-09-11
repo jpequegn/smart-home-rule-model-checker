@@ -1,0 +1,29 @@
+- id: motion-on
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.motion
+      to: "on"
+  actions:
+    - action: light.turn_on
+      target:
+        entity_id: light.hall
+- id: delayed-off
+  mode: restart
+  triggers:
+    - trigger: state
+      entity_id: binary_sensor.motion
+      to: "off"
+  actions:
+    - delay: 3
+    - action: light.turn_off
+      target:
+        entity_id: light.hall
+- id: alarm-on
+  triggers:
+    - trigger: state
+      entity_id: input_boolean.alarm
+      to: "on"
+  actions:
+    - action: light.turn_on
+      target:
+        entity_id: light.hall
