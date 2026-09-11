@@ -1,0 +1,13 @@
+[package]
+name = "home-rule-cli"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+[[bin]]
+name = "homecheck"
+path = "src/main.rs"
+[dependencies]
+home-rule-core = { path = "../core" }
+home-rule-ha = { path = "../ha" }
+serde_json.workspace = true
+clap = { version = "4", features = ["derive"] }
