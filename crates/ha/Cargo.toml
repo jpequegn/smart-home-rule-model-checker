@@ -1,5 +1,6 @@
 [package]
 name = "home-rule-ha"
+autotests = false
 version.workspace = true
 edition.workspace = true
 license.workspace = true
@@ -7,3 +8,15 @@ license.workspace = true
 home-rule-core = { path = "../core" }
 yaml-rust2 = "0.10"
 serde_json.workspace = true
+
+[[test]]
+name = "contracts"
+path = "tests/contracts.rs"
+
+[[test]]
+name = "simulation"
+path = "tests/simulation.rs"
+
+[[test]]
+name = "lint"
+path = "tests/lint.rs"
