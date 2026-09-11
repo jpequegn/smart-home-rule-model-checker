@@ -46,6 +46,58 @@ fn impossible_condition() {
             .unwrap()
             .findings
             .iter()
+            .any(|f| f.code == "trigger_condition_mismatch")
+    );
+}
+
+#[test]
+fn same_time_mismatch_is_not_unreachable() {
+    let mut r = rules();
+    r.truncate(1);
+    r[0].conditions = vec![Predicate::State {
+        entity: "binary_sensor.motion".into(),
+        value: "off".into(),
+    }];
+    let mut s = s();
+    s.events = vec![
+        Event {
+            at: 0,
+            input: Input::Set {
+                entity: "binary_sensor.motion".into(),
+                value: "on".into(),
+            },
+        },
+        Event {
+            at: 0,
+            input: Input::Set {
+                entity: "binary_sensor.motion".into(),
+                value: "off".into(),
+            },
+        },
+    ];
+    assert!(
+        simulate(&s, &r)
+            .unwrap()
+            .trace
+            .iter()
+            .any(|t| t.kind == "action")
+    );
+    assert!(
+        lint(&s, &r)
+            .unwrap()
+            .findings
+            .iter()
+            .all(|f| f.code != "unreachable_conditions")
+    );
+    r[0].conditions.push(Predicate::State {
+        entity: "binary_sensor.motion".into(),
+        value: "on".into(),
+    });
+    assert!(
+        lint(&s, &r)
+            .unwrap()
+            .findings
+            .iter()
             .any(|f| f.code == "unreachable_conditions")
     );
 }

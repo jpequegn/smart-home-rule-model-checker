@@ -288,7 +288,7 @@ pub fn validate(s: &Scenario, rules: &[Automation]) -> Result<()> {
     }
     let mut ids = BTreeSet::new();
     for i in &s.invariants {
-        if i.id().is_empty() || !ids.insert(i.id()) {
+        if i.id().is_empty() || i.id().len() > 100 || !ids.insert(i.id()) {
             return Err("duplicate/empty invariant id".into());
         }
         match i {
@@ -297,7 +297,7 @@ pub fn validate(s: &Scenario, rules: &[Automation]) -> Result<()> {
                 requires: conditions,
                 ..
             } => {
-                if conditions.is_empty() {
+                if conditions.is_empty() || conditions.len() > 32 {
                     return Err("empty invariant predicate".into());
                 }
                 for p in conditions {

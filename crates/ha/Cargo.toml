@@ -24,3 +24,14 @@ path = "tests/lint.rs"
 [[test]]
 name = "verification"
 path = "tests/verification.rs"
+
+[[test]]
+name = "corpus"
+path = "tests/corpus.rs"
+
+[[test]]
+name = "properties"
+path = "tests/properties.rs"
+
+[dev-dependencies]
+proptest = "1"

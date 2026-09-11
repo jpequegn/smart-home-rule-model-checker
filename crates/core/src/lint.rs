@@ -128,21 +128,27 @@ pub fn lint(s: &Scenario, rules: &[Automation]) -> Result<Lint> {
                 tier: ["observational", "comfort", "property", "access_safety"][tier].into(),
             });
         };
-        if contradictory(&r.conditions)
-            || r.triggers.iter().all(|t| {
-                t.unknown.is_none()
-                    && t.to.as_ref().is_some_and(|to| {
-                        r.conditions.iter().any(
-                    |p| matches!(p,Predicate::State{entity,value} if entity==&t.entity&&value!=to),
-                )
-                    })
-            })
-        {
+        if contradictory(&r.conditions) {
             add(
                 "unreachable_conditions",
-                "Trigger-time state constraints contradict every modeled trigger".into(),
+                "Admission conditions require contradictory states".into(),
                 r.source.clone(),
                 "static",
+            );
+        }
+        if r.triggers.iter().all(|t| {
+            t.unknown.is_none()
+                && t.to.as_ref().is_some_and(|to| {
+                    r.conditions.iter().any(
+                    |p| matches!(p,Predicate::State{entity,value} if entity==&t.entity&&value!=to),
+                )
+                })
+        }) {
+            add(
+                "trigger_condition_mismatch",
+                "Trigger target differs from admission conditions; same-time event ordering can matter".into(),
+                r.source.clone(),
+                "potential",
             );
         }
         if actions[i]
@@ -189,7 +195,12 @@ pub fn lint(s: &Scenario, rules: &[Automation]) -> Result<Lint> {
         }
         for a in &actions[i] {
             if let Some((entity, value)) = write(a) {
-                if matches!(s.entities[entity].tier,Tier::Property|Tier::AccessSafety) && !s.invariants.iter().any(|inv|matches!(inv,Invariant::Guard{entity:e,value:v,..} if e==entity&&(value=="*"||v==value))) {
+                let values: Vec<&str> = if value == "*" {
+                    vec!["on", "off"]
+                } else {
+                    vec![value]
+                };
+                if matches!(s.entities[entity].tier,Tier::Property|Tier::AccessSafety) && values.iter().any(|target| !s.invariants.iter().any(|inv|matches!(inv,Invariant::Guard{entity:e,value:v,..} if e==entity&&v==target))) {
                     add("missing_safety_guard",format!("{entity} write has no matching action-guard invariant"),a.source.clone(),"potential");
                 }
                 for (j, target) in rules.iter().enumerate() {
@@ -242,18 +253,33 @@ pub fn lint(s: &Scenario, rules: &[Automation]) -> Result<Lint> {
             assigned.insert(*j);
         }
         let component: Vec<_> = ids.iter().map(|j| rules[*j].id.clone()).collect();
-        out.findings.push(Finding{code:"trigger_cycle".into(),certainty:"potential".into(),message:"Cyclic trigger/write interaction; simulate to distinguish stable states from repeated toggling".into(),automations:component.clone(),sources:ids.iter().map(|j|rules[*j].source.clone()).collect(),tier:"review".into()});
+        let rank = ids
+            .iter()
+            .flat_map(|j| &actions[*j])
+            .filter_map(|a| write(a))
+            .map(|(entity, _)| match s.entities[entity].tier {
+                Tier::Observational => 0,
+                Tier::Comfort => 1,
+                Tier::Property => 2,
+                Tier::AccessSafety => 3,
+            })
+            .max()
+            .unwrap_or(0);
+        let tier = ["observational", "comfort", "property", "access_safety"][rank].to_string();
+        out.findings.push(Finding{code:"trigger_cycle".into(),certainty:"potential".into(),message:"Cyclic trigger/write interaction; simulate to distinguish stable states from repeated toggling".into(),automations:component.clone(),sources:ids.iter().map(|j|rules[*j].source.clone()).collect(),tier});
         out.components.push(component);
     }
-    for reason in unsupported(rules) {
-        out.findings.push(Finding {
-            code: "unsupported".into(),
-            certainty: "unknown".into(),
-            message: reason,
-            automations: vec![],
-            sources: vec![],
-            tier: "unknown".into(),
-        });
+    for rule in rules {
+        for reason in unsupported(std::slice::from_ref(rule)) {
+            out.findings.push(Finding {
+                code: "unsupported".into(),
+                certainty: "unknown".into(),
+                message: reason,
+                automations: vec![rule.id.clone()],
+                sources: vec![rule.source.clone()],
+                tier: "unknown".into(),
+            });
+        }
     }
     Ok(out)
 }

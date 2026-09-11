@@ -1,0 +1,19 @@
+[package]
+name = "homecheck-fuzz"
+version = "0.0.0"
+publish = false
+edition = "2024"
+[package.metadata]
+cargo-fuzz = true
+[dependencies]
+libfuzzer-sys = "0.4"
+home-rule-ha = { path = "../crates/ha" }
+home-rule-core = { path = "../crates/core" }
+[[bin]]
+name = "parse_model"
+path = "fuzz_targets/parse_model.rs"
+test = false
+doc = false
+bench = false
+[workspace]
+members = ["."]
