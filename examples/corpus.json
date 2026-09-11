@@ -1,0 +1,3132 @@
+{
+  "version": 1,
+  "cases": [
+    {
+      "name": "alarm-delayed-violation",
+      "yaml": "- id: motion-on\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n- id: delayed-off\n  mode: restart\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"off\"\n  actions:\n    - delay: 3\n    - action: light.turn_off\n      target:\n        entity_id: light.hall\n- id: alarm-on\n  triggers:\n    - trigger: state\n      entity_id: input_boolean.alarm\n      to: \"on\"\n  actions:\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          },
+          {
+            "at": 1,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "off"
+            }
+          },
+          {
+            "at": 2,
+            "input": {
+              "kind": "set",
+              "entity": "input_boolean.alarm",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "guard",
+            "id": "alarm-keeps-light-on",
+            "entity": "light.hall",
+            "value": "off",
+            "requires": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "off"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "violation",
+        "action_times": [
+          0,
+          2,
+          4
+        ],
+        "lint_codes": [
+          "delayed_write",
+          "opposing_writes"
+        ]
+      }
+    },
+    {
+      "name": "alarm-guarded-safe",
+      "yaml": "- id: motion-on\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n- id: delayed-off\n  mode: restart\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"off\"\n  actions:\n    - delay: 3\n    - condition: state\n      entity_id: input_boolean.alarm\n      state: \"off\"\n    - action: light.turn_off\n      target:\n        entity_id: light.hall\n- id: alarm-on\n  triggers:\n    - trigger: state\n      entity_id: input_boolean.alarm\n      to: \"on\"\n  actions:\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          },
+          {
+            "at": 1,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "off"
+            }
+          },
+          {
+            "at": 2,
+            "input": {
+              "kind": "set",
+              "entity": "input_boolean.alarm",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "guard",
+            "id": "alarm-keeps-light-on",
+            "entity": "light.hall",
+            "value": "off",
+            "requires": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "off"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [
+          0,
+          2
+        ],
+        "lint_codes": [
+          "delayed_write"
+        ]
+      }
+    },
+    {
+      "name": "mode-single",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - delay: 3\n    - action: light.toggle\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          },
+          {
+            "at": 1,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "off"
+            }
+          },
+          {
+            "at": 2,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [
+          3
+        ],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "mode-restart",
+      "yaml": "- id: test\n  mode: restart\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - delay: 3\n    - action: light.toggle\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          },
+          {
+            "at": 1,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "off"
+            }
+          },
+          {
+            "at": 2,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [
+          5
+        ],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "mode-queued",
+      "yaml": "- id: test\n  mode: queued\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - delay: 3\n    - action: light.toggle\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          },
+          {
+            "at": 1,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "off"
+            }
+          },
+          {
+            "at": 2,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [
+          3,
+          6
+        ],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "mode-parallel",
+      "yaml": "- id: test\n  mode: parallel\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - delay: 3\n    - action: light.toggle\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          },
+          {
+            "at": 1,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "off"
+            }
+          },
+          {
+            "at": 2,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [
+          3,
+          5
+        ],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "restart-cancels-delay",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - delay: 3\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          },
+          {
+            "at": 1,
+            "input": {
+              "kind": "restart"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "reload-cancels-delay",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - delay: 3\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          },
+          {
+            "at": 1,
+            "input": {
+              "kind": "reload"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "wait-success",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - wait_for_trigger:\n        - trigger: state\n          entity_id: binary_sensor.motion\n          to: \"off\"\n      timeout: 4\n      continue_on_timeout: false\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          },
+          {
+            "at": 1,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "off"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [
+          1
+        ],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "wait-timeout-stop",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - wait_for_trigger:\n        - trigger: state\n          entity_id: binary_sensor.motion\n          to: \"off\"\n      timeout: 4\n      continue_on_timeout: false\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "wait-timeout-continue",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - wait_for_trigger:\n        - trigger: state\n          entity_id: binary_sensor.motion\n          to: \"off\"\n      timeout: 4\n      continue_on_timeout: true\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [
+          4
+        ],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "condition-stops",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - condition: state\n      entity_id: light.hall\n      state: \"on\"\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "choose-selected",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - choose:\n        - conditions:\n            - condition: state\n              entity_id: binary_sensor.motion\n              state: \"on\"\n          sequence:\n            - action: light.turn_on\n              target:\n                entity_id: light.hall\n      default:\n        - action: light.toggle\n          target:\n            entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [
+          0
+        ],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "choose-default",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - choose:\n        - conditions:\n            - condition: state\n              entity_id: binary_sensor.motion\n              state: \"off\"\n          sequence:\n            - action: light.turn_on\n              target:\n                entity_id: light.hall\n      default:\n        - action: light.toggle\n          target:\n            entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [
+          0
+        ],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "toggle-cycle",
+      "yaml": "- id: test\n  mode: parallel\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: light.hall\n  actions:\n    - action: light.toggle\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "light.hall",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "transition",
+            "id": "no-off",
+            "entity": "light.hall",
+            "from": "on",
+            "to": "off"
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 50,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "violation",
+        "action_times": [
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "lint_codes": [
+          "trigger_cycle"
+        ]
+      }
+    },
+    {
+      "name": "unsupported-service",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - action: lock.unlock\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "unknown",
+        "action_times": [],
+        "lint_codes": [
+          "unsupported"
+        ]
+      }
+    },
+    {
+      "name": "unsupported-duration-trigger",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n      for: 10\n  actions:\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "unknown",
+        "action_times": [],
+        "lint_codes": [
+          "unsupported"
+        ]
+      }
+    },
+    {
+      "name": "broad-target-unknown",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - action: light.turn_on\n      target:\n        area_id: hallway\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "unknown",
+        "action_times": [],
+        "lint_codes": [
+          "unsupported"
+        ]
+      }
+    },
+    {
+      "name": "template-unknown",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  conditions:\n    - condition: state\n      entity_id: light.hall\n      state: \"{{ sensor }}\"\n  actions:\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "unknown",
+        "action_times": [],
+        "lint_codes": [
+          "unsupported"
+        ]
+      }
+    },
+    {
+      "name": "stale-sensor",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  conditions:\n    - condition: state\n      entity_id: input_boolean.alarm\n      state: \"off\"\n  actions:\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": 0
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 2,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "unknown",
+        "action_times": [],
+        "lint_codes": [
+          "freshness_assumption"
+        ]
+      }
+    },
+    {
+      "name": "unavailable-sensor",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  conditions:\n    - condition: state\n      entity_id: input_boolean.alarm\n      state: \"off\"\n  actions:\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "unavailable",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "unknown",
+        "action_times": [],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "unreachable-condition",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  conditions:\n    - condition: state\n      entity_id: binary_sensor.motion\n      state: \"off\"\n  actions:\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [],
+        "lint_codes": [
+          "trigger_condition_mismatch"
+        ]
+      }
+    },
+    {
+      "name": "property-without-guard",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "property",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [
+          0
+        ],
+        "lint_codes": [
+          "missing_safety_guard"
+        ]
+      }
+    },
+    {
+      "name": "opposing-writes",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n- id: other\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - action: light.turn_off\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "on",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "guard",
+            "id": "alarm-keeps-light-on",
+            "entity": "light.hall",
+            "value": "off",
+            "requires": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "off"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "violation",
+        "action_times": [
+          0,
+          0
+        ],
+        "lint_codes": [
+          "opposing_writes"
+        ]
+      }
+    },
+    {
+      "name": "benign-concurrent-writes",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n- id: other\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [
+          0,
+          0
+        ],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "response-missed",
+      "yaml": "[]\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "response",
+            "id": "light-deadline",
+            "when": {
+              "kind": "state",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            },
+            "then": {
+              "kind": "state",
+              "entity": "light.hall",
+              "value": "on"
+            },
+            "within": 3
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "violation",
+        "action_times": [],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "response-exact-deadline",
+      "yaml": "- id: test\n  mode: single\n  max: 3\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - delay: 3\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "response",
+            "id": "light-deadline",
+            "when": {
+              "kind": "state",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            },
+            "then": {
+              "kind": "state",
+              "entity": "light.hall",
+              "value": "on"
+            },
+            "within": 3
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [
+          3
+        ],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "response-horizon-incomplete",
+      "yaml": "[]\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "response",
+            "id": "light-deadline",
+            "when": {
+              "kind": "state",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            },
+            "then": {
+              "kind": "state",
+              "entity": "light.hall",
+              "value": "on"
+            },
+            "within": 3
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 2,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "incomplete",
+        "action_times": [],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "parallel-cap",
+      "yaml": "- id: test\n  mode: parallel\n  max: 1\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - delay: 3\n    - action: light.toggle\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          },
+          {
+            "at": 1,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "off"
+            }
+          },
+          {
+            "at": 2,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "never",
+            "id": "no-alarm",
+            "conditions": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "on"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "no_violation_in_trace",
+        "action_times": [
+          3
+        ],
+        "lint_codes": []
+      }
+    },
+    {
+      "name": "safety-tier-guard",
+      "yaml": "- id: motion-on\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"on\"\n  actions:\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n- id: delayed-off\n  mode: restart\n  triggers:\n    - trigger: state\n      entity_id: binary_sensor.motion\n      to: \"off\"\n  actions:\n    - delay: 3\n    - action: light.turn_off\n      target:\n        entity_id: light.hall\n- id: alarm-on\n  triggers:\n    - trigger: state\n      entity_id: input_boolean.alarm\n      to: \"on\"\n  actions:\n    - action: light.turn_on\n      target:\n        entity_id: light.hall\n",
+      "scenario": {
+        "version": 1,
+        "title": "Delayed light-off conflicts with alarm",
+        "entities": {
+          "binary_sensor.motion": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "input_boolean.alarm": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "observational",
+            "stale_after": null
+          },
+          "light.hall": {
+            "domain": [
+              "on",
+              "off"
+            ],
+            "initial": "off",
+            "tier": "access_safety",
+            "stale_after": null
+          }
+        },
+        "events": [
+          {
+            "at": 0,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "on"
+            }
+          },
+          {
+            "at": 1,
+            "input": {
+              "kind": "set",
+              "entity": "binary_sensor.motion",
+              "value": "off"
+            }
+          },
+          {
+            "at": 2,
+            "input": {
+              "kind": "set",
+              "entity": "input_boolean.alarm",
+              "value": "on"
+            }
+          }
+        ],
+        "invariants": [
+          {
+            "kind": "guard",
+            "id": "alarm-keeps-light-on",
+            "entity": "light.hall",
+            "value": "off",
+            "requires": [
+              {
+                "kind": "state",
+                "entity": "input_boolean.alarm",
+                "value": "off"
+              }
+            ]
+          }
+        ],
+        "alphabet": [
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "on"
+          },
+          {
+            "kind": "set",
+            "entity": "binary_sensor.motion",
+            "value": "off"
+          },
+          {
+            "kind": "set",
+            "entity": "input_boolean.alarm",
+            "value": "on"
+          },
+          {
+            "kind": "restart"
+          }
+        ],
+        "gaps": [
+          0,
+          1,
+          3
+        ],
+        "limits": {
+          "horizon": 12,
+          "max_steps": 200,
+          "search_depth": 3,
+          "max_cases": 2000
+        }
+      },
+      "expected": {
+        "status": "violation",
+        "action_times": [
+          0,
+          2,
+          4
+        ],
+        "lint_codes": [
+          "missing_safety_guard"
+        ]
+      }
+    }
+  ]
+}

@@ -20,6 +20,7 @@ jobs:
           node-version: 22
       - run: cargo install wasm-pack --version 0.13.1 --locked
       - run: wasm-pack build crates/wasm --target web --out-dir ../../web/pkg --release
+      - run: wasm-pack test --node crates/wasm
       - run: npm ci && npm run build
         working-directory: web
       - run: cargo build -p home-rule-cli --locked
