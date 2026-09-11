@@ -1,0 +1,394 @@
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  background: #fafbf9;
+  color: #202921;
+  font:
+    14px/1.45 system-ui,
+    sans-serif;
+  letter-spacing: 0;
+}
+button,
+select,
+input,
+textarea {
+  font: inherit;
+  color: inherit;
+}
+button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  background: #fff;
+  border: 1px solid #c9d1cb;
+  border-radius: 4px;
+  min-height: 34px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+button:hover {
+  background: #eef3ef;
+}
+button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid #26835a;
+  outline-offset: 2px;
+}
+button svg {
+  width: 16px;
+  height: 16px;
+}
+header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 18px 24px;
+  border-bottom: 1px solid #d8ded9;
+  background: #fff;
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.brand > svg {
+  width: 30px;
+  height: 30px;
+  color: #24764e;
+}
+h1 {
+  font-size: 22px;
+  line-height: 1.2;
+  margin: 0;
+}
+h2 {
+  font-size: 22px;
+  line-height: 1.2;
+  margin: 5px 0;
+  overflow-wrap: anywhere;
+}
+h3 {
+  font-size: 15px;
+  margin: 0;
+}
+.brand span,
+.offline {
+  font-size: 12px;
+  color: #576358;
+}
+.offline {
+  border-left: 3px solid #329467;
+  padding-left: 8px;
+}
+.toolbar {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+  padding: 12px 24px;
+  border-bottom: 1px solid #d8ded9;
+}
+.toolbar label {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+}
+.tools {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+select,
+input[type="number"] {
+  background: #fff;
+  border: 1px solid #c9d1cb;
+  border-radius: 4px;
+  padding: 7px;
+  max-width: 100%;
+}
+#run {
+  background: #226747;
+  color: white;
+  border-color: #226747;
+}
+main {
+  display: grid;
+  grid-template-columns: minmax(300px, 38%) minmax(0, 1fr);
+  max-width: 1800px;
+  margin: auto;
+}
+.inputs {
+  border-right: 1px solid #d8ded9;
+  min-width: 0;
+  padding: 16px;
+  background: #f2f5f1;
+}
+.tabs {
+  display: flex;
+  gap: 5px;
+}
+.tabs button {
+  border: none;
+  background: transparent;
+  border-radius: 0;
+  border-bottom: 2px solid transparent;
+}
+.tabs [aria-selected="true"] {
+  border-bottom-color: #26734e;
+  font-weight: 600;
+}
+.editor-head {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  color: #626d62;
+  font-size: 12px;
+}
+textarea {
+  display: block;
+  width: 100%;
+  height: 570px;
+  resize: vertical;
+  background: #fff;
+  border: 1px solid #d1d9d2;
+  border-radius: 4px;
+  padding: 12px;
+  font:
+    12px/20px ui-monospace,
+    monospace;
+  tab-size: 2;
+  white-space: pre;
+  overflow: auto;
+}
+textarea[hidden] {
+  display: none;
+}
+.limits {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-top: 12px;
+}
+.limits label {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  font-size: 12px;
+}
+.results {
+  padding: 20px 24px;
+  min-width: 0;
+}
+.result-head,
+.section-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  align-items: center;
+}
+.eyebrow {
+  font-size: 12px;
+  color: #6a756a;
+}
+#summary {
+  margin: 5px 0 10px;
+  color: #5a675e;
+}
+#bounds {
+  font-size: 12px;
+  padding: 10px 0;
+  border-bottom: 1px solid #d8ded9;
+  color: #566259;
+}
+.bad {
+  color: #a52336;
+}
+.warn {
+  color: #95650e;
+}
+#error {
+  border-left: 3px solid #b72f40;
+  background: #fff0f1;
+  padding: 12px;
+  margin: 10px 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+.finding {
+  padding: 10px 0;
+  border-bottom: 1px solid #e0e5df;
+}
+.finding strong {
+  font-size: 12px;
+}
+.finding p {
+  font-size: 12px;
+  margin: 3px 0;
+  color: #566259;
+}
+.finding button {
+  font-size: 11px;
+  min-height: 24px;
+  padding: 2px 6px;
+  margin-right: 4px;
+}
+.section-head {
+  margin: 18px 0 8px;
+}
+#position {
+  font:
+    12px ui-monospace,
+    monospace;
+}
+canvas {
+  display: block;
+  width: 100%;
+  height: 122px;
+  border-radius: 3px;
+}
+.scrubber {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  padding: 10px 0;
+}
+.scrubber input {
+  flex: 1;
+  min-width: 0;
+  accent-color: #25734d;
+}
+#states {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 8px;
+}
+#states > div {
+  border-bottom: 1px solid #d9dfda;
+  padding: 6px 0;
+  display: flex;
+  flex-direction: column;
+  font-size: 11px;
+  overflow-wrap: anywhere;
+}
+#states strong {
+  font-size: 14px;
+}
+.on {
+  color: #218355;
+}
+.table-wrap {
+  max-height: 340px;
+  overflow: auto;
+  border-top: 1px solid #ccd6cc;
+}
+table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 11px;
+}
+th {
+  text-align: left;
+  background: #eef2ec;
+  position: sticky;
+  top: 0;
+}
+th,
+td {
+  padding: 7px;
+  border-bottom: 1px solid #e0e5df;
+  vertical-align: top;
+  overflow-wrap: anywhere;
+}
+td button {
+  padding: 2px 4px;
+  font-size: 11px;
+  min-height: 24px;
+}
+tr {
+  cursor: pointer;
+}
+tr.selected {
+  background: #e0f0e7;
+}
+details {
+  margin-top: 18px;
+}
+summary {
+  cursor: pointer;
+  font-size: 12px;
+}
+pre {
+  max-height: 400px;
+  overflow: auto;
+  background: #eef2ed;
+  padding: 12px;
+  font-size: 11px;
+}
+footer {
+  padding: 14px 24px;
+  font-size: 12px;
+  color: #687369;
+  border-top: 1px solid #d8ded9;
+}
+[hidden] {
+  display: none !important;
+}
+@media (max-width: 760px) {
+  header {
+    padding: 14px;
+    align-items: flex-start;
+  }
+  .offline {
+    max-width: 120px;
+  }
+  .toolbar {
+    padding: 12px 14px;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .toolbar label {
+    flex-wrap: wrap;
+  }
+  .toolbar select {
+    flex: 1;
+    min-width: 0;
+  }
+  .tools {
+    justify-content: flex-start;
+  }
+  main {
+    grid-template-columns: 1fr;
+  }
+  .inputs {
+    border-right: 0;
+    border-bottom: 1px solid #d8ded9;
+    padding: 14px;
+  }
+  textarea {
+    height: 260px;
+  }
+  .results {
+    padding: 16px 14px;
+  }
+  h2 {
+    font-size: 19px;
+  }
+  #states {
+    grid-template-columns: 1fr 1fr;
+  }
+  footer {
+    padding: 14px;
+  }
+}

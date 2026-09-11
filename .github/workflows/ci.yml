@@ -15,3 +15,12 @@ jobs:
       - run: cargo clippy --workspace --all-targets --locked -- -D warnings
       - run: cargo test --workspace --locked
       - run: cargo build -p home-rule-wasm --target wasm32-unknown-unknown --locked
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: cargo install wasm-pack --version 0.13.1 --locked
+      - run: wasm-pack build crates/wasm --target web --out-dir ../../web/pkg --release
+      - run: npm ci && npm run build
+        working-directory: web
+      - run: cargo build -p home-rule-cli --locked
+      - run: node scripts/parity.mjs
