@@ -4,3 +4,5 @@ mod model;
 pub use model::*;
 mod engine;
 pub use engine::*;
+mod lint;
+pub use lint::*;
